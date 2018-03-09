@@ -1,0 +1,8 @@
+nasm -f elf64 boot.s
+nasm -f elf64 multiboot_header.s
+ld -n -o kernel.bin -T linker.ld multiboot_header.o boot.o
+mkdir isofiles
+mkdir -p isofiles/boot/grub
+mv grub.cfg isofiles/boot/grub/
+mv kernel.bin isofiles/boot/
+grub-mkrescue -o os.iso isofiles
