@@ -4,10 +4,22 @@ section .text
 bits 32
 start:
     mov esp, stack_top
+    call check_multiboot
 
+main:
     ; print `OK` to screen
     mov dword [0xb8000], 0x2f4b2f4f
     hlt
+
+check_multiboot:
+    ; Multiboot specification states that a compliant bootloader must write
+    ; magic value 0x36d76289 to eax before loading a kernel.
+    cmp eax, 0x36d76289
+    jne .no_multiboot
+    ret
+.no_multiboot:
+    mov al, "0"
+    jmp error
 
 ; Print "ERR: <error code>" to screen and hang
 ; param: error code (ascii) in al
