@@ -9,6 +9,8 @@ start:
     call check_cpuid
     call check_long_mode
 
+    call set_up_page_tables
+
 main:
     ; print `OK` to screen
     mov dword [0xb8000], 0x2f4b2f4f
@@ -78,6 +80,33 @@ check_long_mode:
     mov al, "2"
     jmp error
 
+set_up_page_tables:
+    ; Map first PDPT entry to PDT table
+    mov eax, PDT
+    or eax, 0b11 ; present + writable
+    mov [PDPT], eax
+
+    ; Map first PDT entry to PT table
+    mov eax, PT
+    or eax, 0b11 ; present + writable
+    mov [PDT], eax
+
+    ; Map each PT entry to a huge 2MiB page
+    mov ecx, 0 ; zero counter
+
+.map_PT_table:
+    ; Map n-th PT entry to a huge page that starts at address (2MiB + ecx)
+    mov eax, 0x200000   ; 2MiB
+    mul ecx             ; Start address of n-th page
+    or eax, 0b10000011  ; present + writable + huge
+    mov [PT + ecx * 8], eax ; map n-th entry
+
+    inc ecx
+    cmp ecx, 512
+    jne .map_PT_table
+
+    ret
+
 ; Print "ERR: <error code>" to screen and hang
 ; param: error code (ascii) in al
 error:
@@ -88,6 +117,13 @@ error:
     hlt
 
 section .bss
+align 4096
+PDPT:
+    resb 4096
+PDT:
+    resb 4096
+PT:
+    resb 4096
 stack_bottom:
     resb 64
 stack_top:
