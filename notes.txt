@@ -17,3 +17,6 @@ assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
 hexdump -x multiboot_header
 ndisasm -b 32 boot
 objdump -h kernel.bin
+
+#### Rust tools
+rustup override add nightly
