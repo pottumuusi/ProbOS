@@ -26,12 +26,10 @@ LD := ld
 
 $(shell if [ ! -d $(OUT_GRUB) ] ; then mkdir -p $(OUT_GRUB) ; fi)
 
-all: $(OUT_ISO)
+all: $(KERNEL_OUT) $(GRUBCFG_OUT)
 
-$(OUT_ISO): $(KERNEL_OUT) $(GRUBCFG_OUT)
-
-$(BOOTABLE_OUT): $(OUT_ISO)
-	$(shell grub-mkrescue -o $@ $<)
+$(BOOTABLE_OUT): $(KERNEL_OUT) $(GRUBCFG_OUT)
+	$(shell grub-mkrescue -o $@ $(OUT_ISO))
 
 $(OUT_DIR)/%.o: $(SRC_DIR)/%.s
 	$(ASM) $(ASM_FLAGS) -o $@ $<
