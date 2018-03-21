@@ -1,0 +1,7 @@
+[package]
+name = "probos"
+version = "0.0.1"
+authors = ["Aleksi Backman"]
+
+[lib]
+crate-type = ["staticlib"] # Library that contains all of its dependencies

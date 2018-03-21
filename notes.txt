@@ -19,4 +19,5 @@ ndisasm -b 32 boot
 objdump -h kernel.bin
 
 #### Rust tools
-rustup override add nightly
+rustup override add nightly # Nightly tools for unstable features
+cargo build
