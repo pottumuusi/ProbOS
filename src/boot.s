@@ -1,5 +1,7 @@
 global start
 
+extern long_mode_start
+
 section .text
 bits 32
 start:
@@ -14,7 +16,10 @@ start:
 
     lgdt [gdt64.pointer]
 
-main:
+    ; Reload cs by using far jump
+    jmp gdt64.code:long_mode_start
+
+main_32:
     ; print `OK` to screen
     mov dword [0xb8000], 0x2f4b2f4f
     hlt
