@@ -10,6 +10,7 @@ start:
     call check_long_mode
 
     call set_up_page_tables
+    call enable_paging
 
 main:
     ; print `OK` to screen
@@ -104,6 +105,29 @@ set_up_page_tables:
     inc ecx
     cmp ecx, 512
     jne .map_PT_table
+
+    ret
+
+enable_paging:
+    ; CPU uses cr3 to get access to high level page table
+    mov eax, PDPT
+    mov cr3, eax
+
+    ; Enable Physical Address Extension (PAE) flag
+    mov eax, cr4
+    or eax, 1 << 5
+    mov cr4, eax
+
+    ; Set the long mode bit in the EFER MSR (model specifig register)
+    mov ecx, 0xC0000080
+    rdmsr
+    or eax, 1 << 8
+    wrmsr
+
+    ; Enable paging
+    mov eax, cr0
+    or eax, 1 << 31
+    mov cr0, eax
 
     ret
 
