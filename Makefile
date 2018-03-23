@@ -74,3 +74,4 @@ clean:
 	$(foreach a_dir, $(OUT_ISO), \
 		$(shell if [ -d $(a_dir) ] ; then rm -rf $(a_dir) ; fi) \
 	)
+	@cargo clean
