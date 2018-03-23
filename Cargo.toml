@@ -5,3 +5,6 @@ authors = ["Aleksi Backman"]
 
 [lib]
 crate-type = ["staticlib"] # Library that contains all of its dependencies
+
+[dependencies]
+rlibc = "1.0"

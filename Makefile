@@ -29,7 +29,7 @@ ASSEMBLER := nasm
 ASM_FLAGS := -f elf64
 
 LD_SCRIPT := $(SRC_DIR)/linker.ld
-LDFLAGS := -n -T $(LD_SCRIPT)
+LDFLAGS := -n --gc-sections -T $(LD_SCRIPT)
 LD := ld
 
 KERNEL_DEPS := \
