@@ -2,6 +2,9 @@ global long_mode_start
 
 section .text
 bits 64
+
+extern rust_main
+
 long_mode_start:
     ; Load 0 into all data segment registers
     mov ax, 0
@@ -10,6 +13,8 @@ long_mode_start:
     mov es, ax
     mov fs, ax
     mov gs, ax
+
+    call rust_main
 
     ; Print OKAY
     mov rax, 0x2f592f412f4b2f4f

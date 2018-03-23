@@ -1,13 +1,23 @@
+ARCH := x86_64
+TARGET := $(ARCH)-probos
+
 OUT_DIR := out
 OUT_ISO := $(OUT_DIR)/iso
 OUT_BOOT := $(OUT_ISO)/boot
 OUT_GRUB := $(OUT_BOOT)/grub
+OUT_RUST_DIR := target/$(TARGET)/debug
 
 SRC_DIR := src
 
-src_w = $(wildcard $(SRC_DIR)/*.s)
-obj_extension = $(src_w:.s=.o)
-OBJ_OUT = $(subst src/,out/,$(obj_extension))
+src_w := $(wildcard $(SRC_DIR)/*.s)
+obj_extension := $(src_w:.s=.o)
+OBJ_OUT := $(subst src/,out/,$(obj_extension))
+
+RUST_CFG := Cargo.toml $(TARGET).json
+RUST_SRC := $(SRC_DIR)/lib.rs $(RUST_CFG)
+
+RUST_OUT_LIB := $(OUT_RUST_DIR)/libprobos.a
+RUST_OUT := $(RUST_OUT_LIB)
 
 KERNEL_OUT := $(OUT_BOOT)/kernel.bin
 GRUBCFG_OUT := $(OUT_GRUB)/grub.cfg
@@ -15,12 +25,17 @@ GRUBCFG_SRC := $(SRC_DIR)/grub.cfg
 
 BOOTABLE_OUT := $(OUT_DIR)/probos.iso
 
-ASM := nasm
+ASSEMBLER := nasm
 ASM_FLAGS := -f elf64
 
 LD_SCRIPT := $(SRC_DIR)/linker.ld
 LDFLAGS := -n -T $(LD_SCRIPT)
 LD := ld
+
+KERNEL_DEPS := \
+	$(OBJ_OUT) \
+	$(LD_SCRIPT) \
+	$(RUST_OUT)
 
 .PHONY: all clean burn simulate iso
 
@@ -32,9 +47,12 @@ $(BOOTABLE_OUT): $(KERNEL_OUT) $(GRUBCFG_OUT)
 	$(shell grub-mkrescue -o $@ $(OUT_ISO))
 
 $(OUT_DIR)/%.o: $(SRC_DIR)/%.s
-	$(ASM) $(ASM_FLAGS) -o $@ $<
+	$(ASSEMBLER) $(ASM_FLAGS) -o $@ $<
 
-$(KERNEL_OUT): $(OBJ_OUT)
+$(RUST_OUT_LIB): $(RUST_SRC)
+	@RUST_TARGET_PATH=$(shell pwd) xargo build --target $(TARGET)
+
+$(KERNEL_OUT): $(KERNEL_DEPS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 $(GRUBCFG_OUT): $(GRUBCFG_SRC)
