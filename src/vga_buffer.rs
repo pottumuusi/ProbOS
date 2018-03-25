@@ -80,16 +80,23 @@ impl Writer {
     }
 
     fn new_line(&mut self) { /* TODO */ }
+}
 
+use core::fmt;
 
-    pub fn write_str(&mut self, s: &str) {
+impl fmt::Write for Writer {
+    // Trait methods are always public.
+    fn write_str(&mut self, s: &str) -> fmt::Result {
         for byte in s.bytes() {
             self.write_byte(byte)
         }
+        Ok(())
     }
 }
 
 pub fn print_something() {
+    use core::fmt::Write;
+
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::LightGreen, Color::Black),
@@ -97,6 +104,6 @@ pub fn print_something() {
     };
 
     writer.write_byte(b'H');
-
-    writer.write_str(" Hello again");
+    writer.write_str("ello again!");
+    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0);
 }
