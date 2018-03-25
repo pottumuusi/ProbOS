@@ -32,10 +32,13 @@ LD_SCRIPT := $(SRC_DIR)/linker.ld
 LDFLAGS := -n --gc-sections -T $(LD_SCRIPT)
 LD := ld
 
-KERNEL_DEPS := \
+KERNEL_SRC := \
 	$(OBJ_OUT) \
-	$(LD_SCRIPT) \
 	$(RUST_OUT)
+
+KERNEL_DEPS := \
+	$(LD_SCRIPT) \
+	$(KERNEL_SRC)
 
 .PHONY: all clean burn simulate iso
 
@@ -53,7 +56,7 @@ $(RUST_OUT_LIB): $(RUST_SRC)
 	@RUST_TARGET_PATH=$(shell pwd) xargo build --target $(TARGET)
 
 $(KERNEL_OUT): $(KERNEL_DEPS)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $(KERNEL_SRC)
 
 $(GRUBCFG_OUT): $(GRUBCFG_SRC)
 	$(shell cp $< $@)
@@ -61,7 +64,7 @@ $(GRUBCFG_OUT): $(GRUBCFG_SRC)
 iso: $(BOOTABLE_OUT)
 
 simulate: $(BOOTABLE_OUT)
-	$(shell qemu-system-x86_64 -cdrom $(BOOTABLE_OUT))
+	@qemu-system-x86_64 -cdrom $(BOOTABLE_OUT)
 
 burn: $(BOOTABLE_OUT)
 	$(shell dvd+rw-format -blank=fast /dev/sr0)
