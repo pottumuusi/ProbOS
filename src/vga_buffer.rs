@@ -79,7 +79,27 @@ impl Writer {
         unsafe { self.buffer.as_mut() }
     }
 
-    fn new_line(&mut self) { /* TODO */ }
+    fn new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let buffer = self.buffer();
+                let character = buffer.chars[row][col].read();
+                buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
+
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for col in 0..BUFFER_WIDTH {
+            self.buffer().chars[row][col].write(blank);
+        }
+    }
 }
 
 use core::fmt;
