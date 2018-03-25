@@ -17,6 +17,9 @@ pub extern fn rust_main() {
     vga_buffer::clear_screen();
     println!("Hello World{}", "!");
 
+    // Print with possibility for deadlocking.
+    println!("{}", { println!("inner"); "outer" });
+
     loop{}
 }
 

@@ -70,13 +70,16 @@ macro_rules! print {
         // Extra {} avoid silently importing Write to parent scope when
         // print is used.
 
+        $crate::vga_buffer::print(format_args!($($arg)*));
+    });
+}
+
+pub fn print(args: fmt::Arguments) {
         use core::fmt::Write;
-        let mut writer = $crate::vga_buffer::WRITER.lock();
 
         // Panic if write unsuccessful. Ok is always returned so this should
         // not happen though.
-        writer.write_fmt(format_args!($($arg)*)).unwrap();
-    });
+        WRITER.lock().write_fmt(args).unwrap();
 }
 
 impl Writer {
