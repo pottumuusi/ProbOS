@@ -14,7 +14,7 @@ obj_extension := $(src_w:.s=.o)
 OBJ_OUT := $(subst src/,out/,$(obj_extension))
 
 RUST_CFG := Cargo.toml $(TARGET).json
-RUST_SRC := $(SRC_DIR)/lib.rs $(RUST_CFG)
+RUST_SRC := $(wildcard $(SRC_DIR)/*.rs $(RUST_CFG))
 
 RUST_OUT_LIB := $(OUT_RUST_DIR)/libprobos.a
 RUST_OUT := $(RUST_OUT_LIB)
