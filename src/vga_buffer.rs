@@ -42,8 +42,9 @@ struct ScreenChar {
     color_code: ColorCode,
 }
 
+use volatile::Volatile;
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 impl ColorCode {
@@ -65,10 +66,10 @@ impl Writer {
                 let col = self.column_position;
 
                 let color_code = self.color_code;
-                self.buffer().chars[row][col] = ScreenChar {
+                self.buffer().chars[row][col].write(ScreenChar {
                     ascii_character: byte,
                     color_code: color_code,
-                };
+                });
                 self.column_position += 1;
             }
         }
