@@ -60,6 +60,25 @@ pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     buffer: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
 });
 
+macro_rules! println {
+    ($fmt:expr) => (print!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+}
+
+macro_rules! print {
+    ($($arg:tt)*) => ({
+        // Extra {} avoid silently importing Write to parent scope when
+        // print is used.
+
+        use core::fmt::Write;
+        let mut writer = $crate::vga_buffer::WRITER.lock();
+
+        // Panic if write unsuccessful. Ok is always returned so this should
+        // not happen though.
+        writer.write_fmt(format_args!($($arg)*)).unwrap();
+    });
+}
+
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
