@@ -140,6 +140,12 @@ impl fmt::Write for Writer {
     }
 }
 
+pub fn clear_screen() {
+    for _ in 0..BUFFER_HEIGHT {
+        println!("");
+    }
+}
+
 pub fn print_something() {
     use core::fmt::Write;
 
