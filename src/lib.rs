@@ -1,3 +1,4 @@
+// #![feature(panic_implementation)]
 #![feature(lang_items)]
 #![feature(const_fn)]
 #![feature(ptr_internals)]
@@ -9,6 +10,8 @@ extern crate spin;
 
 #[macro_use]
 mod vga_buffer;
+
+use core::panic::PanicInfo;
 
 #[no_mangle]
 pub extern fn rust_main() {
@@ -24,7 +27,8 @@ pub extern fn rust_main() {
 }
 
 #[lang = "eh_personality"] #[no_mangle] pub extern fn eh_personality() {}
-#[lang = "panic_fmt"] #[no_mangle] pub extern fn panic_fmt() -> ! {
+#[panic_handler] #[no_mangle] pub fn panic(_info: &PanicInfo) -> ! {
+    // TODO use PanicInfo here
     let buffer_ptr = (0xb8000) as *mut _;
     let red = 0x4f;
     unsafe {
