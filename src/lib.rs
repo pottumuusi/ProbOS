@@ -1,4 +1,3 @@
-// #![feature(panic_implementation)]
 #![feature(lang_items)]
 #![feature(const_fn)]
 #![feature(ptr_internals)]
