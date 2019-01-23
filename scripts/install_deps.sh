@@ -1,7 +1,16 @@
 #!/bin/bash
 
-install_compilation_tools="y"
-install_exec_tools="y"
+repo_root=$(cd .. && pwd)
+
+if [ "probos" != $(basename ${repo_root}) ] ; then
+	echo -n "Script is being run from unexpected directory. "
+	echo "Please run from scripts/ of probos project."
+	exit
+fi
+
+install_compilation_tools="n"
+install_build_tools="y"
+install_exec_tools="n"
 distro=""
 
 compilation_tools=" nasm xorriso mtools "
@@ -23,6 +32,10 @@ handle_args() {
 
 	if [ "-e" == "$1" -o  "--noexec" == "$1" ] ; then
 		install_exec_tools="n"
+	fi
+
+	if [ "-e" == "$1" -o  "--nobuild" == "$1" ] ; then
+		install_build_tools="n"
 	fi
 }
 
@@ -48,13 +61,15 @@ decide_tools() {
 }
 
 install_tools() {
-	if [ "ubuntu" == "$distro" ] ; then
-		sudo apt-get install $tools_to_install
-	fi
+	if [ -n "$tools_to_install" ] ; then
+		if [ "ubuntu" == "$distro" ] ; then
+			sudo apt-get install $tools_to_install
+		fi
 
-	if [ "arch" == "$distro" ] ; then
-		# sudo pacman -S nasm xorriso mtools qemu dvd+rw-tools
-		sudo pacman -S $tools_to_install
+		if [ "arch" == "$distro" ] ; then
+			# sudo pacman -S nasm xorriso mtools qemu dvd+rw-tools
+			sudo pacman -S $tools_to_install
+		fi
 	fi
 
 	if [ "y" == "$install_compilation_tools" ] ; then
@@ -72,6 +87,29 @@ install_tools() {
 
 		# Xargo depends on Rust source code
 		rustup component add rust-src
+	fi
+
+	if [ "y" == "$install_build_tools" ] ; then
+		local make_version="4.2"
+		local remote_make_dirname="make-${make_version}"
+		local remote_make_tar="${remote_make_dirname}.tar.gz"
+		local make_build_dir="build_make_here"
+		local make_out_dir="${repo_root}/deps/make"
+		local make_url="http://ftp.gnu.org/gnu/make/${remote_make_tar}"
+
+		pushd ./
+		if [ ! -d "${make_build_dir}" ] ; then
+			mkdir ${make_build_dir}
+		fi
+		cd ${make_build_dir} && wget ${make_url}
+		tar -xzvf ${remote_make_tar}
+		cd ${remote_make_dirname}
+		patch glob/glob.c < ${repo_root}/scripts/patches/glob_glob_dot_c_patch.diff
+		if [ ! -d "${make_out_dir}" ] ; then
+			mkdir -p ${make_out_dir}
+		fi
+		./configure --prefix=${make_out_dir} && sh build.sh && ./make install
+		popd
 	fi
 }
 
