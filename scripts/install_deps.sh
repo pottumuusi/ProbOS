@@ -90,7 +90,7 @@ install_tools() {
 	fi
 
 	if [ "y" == "$install_build_tools" ] ; then
-		local make_version="4.2"
+		local make_version="4.2.1"
 		local remote_make_dirname="make-${make_version}"
 		local remote_make_tar="${remote_make_dirname}.tar.gz"
 		local make_build_dir="build_make_here"
@@ -108,7 +108,12 @@ install_tools() {
 		if [ ! -d "${make_out_dir}" ] ; then
 			mkdir -p ${make_out_dir}
 		fi
-		./configure --prefix=${make_out_dir} && sh build.sh && ./make install
+		./configure \
+			--prefix=${make_out_dir} \
+			--exec-prefix=${make_out_dir} \
+			--program-suffix=42 \
+			&& sh build.sh \
+			&& ./make install
 		popd
 	fi
 }
