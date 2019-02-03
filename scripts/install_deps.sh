@@ -90,30 +90,59 @@ install_tools() {
 	fi
 
 	if [ "y" == "$install_build_tools" ] ; then
-		local make_version="4.2.1"
+		local make_version="3.79.1"
 		local remote_make_dirname="make-${make_version}"
 		local remote_make_tar="${remote_make_dirname}.tar.gz"
 		local make_build_dir="build_make_here"
+		local old_make_build_dir="build_old_make_here"
+		local old_make_out_dir="${repo_root}/deps/old_make"
+		local old_make_out_bin="${repo_root}/deps/old_make/bin/make3791"
 		local make_out_dir="${repo_root}/deps/make"
 		local make_url="http://ftp.gnu.org/gnu/make/${remote_make_tar}"
 
 		pushd ./
+		if [ ! -d "${old_make_build_dir}" ] ; then
+			mkdir ${old_make_build_dir}
+		fi
 		if [ ! -d "${make_build_dir}" ] ; then
 			mkdir ${make_build_dir}
 		fi
-		cd ${make_build_dir} && wget ${make_url}
+		cd ${old_make_build_dir} && wget ${make_url}
 		tar -xzvf ${remote_make_tar}
 		cd ${remote_make_dirname}
 		patch glob/glob.c < ${repo_root}/scripts/patches/glob_glob_dot_c_patch.diff
+		if [ ! -d "${old_make_out_dir}" ] ; then
+			mkdir -p ${old_make_out_dir}
+		fi
 		if [ ! -d "${make_out_dir}" ] ; then
 			mkdir -p ${make_out_dir}
 		fi
 		./configure \
+			--prefix=${old_make_out_dir} \
+			--exec-prefix=${old_make_out_dir} \
+			--program-suffix=3791 \
+			&& sh build.sh \
+			&& ./make install
+		popd
+		pushd ./
+		cd ${make_build_dir}
+		git clone git://git.savannah.gnu.org/make.git && cd make
+		#### _____ Checkout to following commit ____
+		#### commit 214865ed5c66d8e363b16ea74509f23d93456707 (HEAD -> master, origin/master, origin/HEAD)
+		#### Author: Paul Smith <psmith@gnu.org>
+		#### Date:   Sun Sep 16 01:09:10 2018 -0400
+
+		####     * src/arscan.c (ar_member_touch): [SV 54533] Stop \0 in archive headers
+
+		####     diff --git a/src/arscan.c b/src/arscan.c
+		git checkout 214865e
+		./bootstrap || echo "Bootstrap failed" && exit
+		./configure \
 			--prefix=${make_out_dir} \
 			--exec-prefix=${make_out_dir} \
 			--program-suffix=42 \
-			&& sh build.sh \
-			&& ./make install
+			&& ${old_make_out_bin} check \
+			&& ${old_make_out_bin} install
 		popd
 	fi
 }

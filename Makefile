@@ -1,3 +1,6 @@
+#### Build with deps/make/bin/make42
+#### See: scripts/install_deps.sh
+
 ARCH := x86_64
 TARGET := $(ARCH)-probos
 
