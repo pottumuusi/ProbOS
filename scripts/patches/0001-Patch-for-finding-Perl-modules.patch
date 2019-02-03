@@ -1,0 +1,28 @@
+From f4cfe214605415262639b77703714fdffe43b159 Mon Sep 17 00:00:00 2001
+From: Aleksi Backman <bddubbb@gmail.com>
+Date: Sun, 3 Feb 2019 02:05:16 +0200
+Subject: [PATCH] Patch for finding Perl modules
+
+Solution copied from:
+https://git.savannah.gnu.org/cgit/make.git/commit/?id=d9d4e06084a4c7da480bd49a3487aadf6ba77b54
+---
+ tests/run_make_tests.pl | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/run_make_tests.pl b/tests/run_make_tests.pl
+index 916f346..dbd802c 100644
+--- a/tests/run_make_tests.pl
++++ b/tests/run_make_tests.pl
+@@ -58,6 +58,9 @@ if ($^O eq 'VMS')
+   *CORE::GLOBAL::rmdir = \&vms_rmdir;
+ }
+ 
++use FindBin;
++use lib "$FindBin::Bin";
++
+ require "test_driver.pl";
+ require "config-flags.pm";
+ 
+-- 
+2.20.1
+
