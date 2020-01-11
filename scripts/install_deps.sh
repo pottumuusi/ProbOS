@@ -2,7 +2,7 @@
 
 repo_root=$(cd .. && pwd)
 
-if [ "probos" != $(basename ${repo_root}) ] ; then
+if [ -z "$(echo $(basename ${repo_root}) | grep -i probos)" ] ; then
 	echo -n "Script is being run from unexpected directory. "
 	echo "Please run from scripts/ of probos project."
 	exit
