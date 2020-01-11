@@ -18,6 +18,11 @@ exec_tools=" qemu dvd+rw-tools "
 
 tools_to_install=""
 
+error_exit() {
+	echo "$1 ==> Exiting"
+	exit 1
+}
+
 handle_args() {
 	if [ "-h" == "$1" -o "--help" == "$1" ] ; then
 		echo -e "\nOptions:"
@@ -45,8 +50,7 @@ detect_distro() {
 	elif [ -n "$(which pacman 2> /dev/null)" ] ; then
 		distro="arch"
 	else
-		echo "Unsupported distribution. Exiting..."
-		exit
+		error_exit "Unsupported distribution."
 	fi
 }
 
@@ -136,7 +140,7 @@ install_tools() {
 
 		####     diff --git a/src/arscan.c b/src/arscan.c
 		git checkout 214865e
-		./bootstrap || echo "Bootstrap failed" && exit
+		./bootstrap || error_exit "Bootstrap failed"
 		./configure \
 			--prefix=${make_out_dir} \
 			--exec-prefix=${make_out_dir} \
