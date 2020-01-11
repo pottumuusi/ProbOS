@@ -8,9 +8,9 @@ if [ -z "$(echo $(basename ${repo_root}) | grep -i probos)" ] ; then
 	exit
 fi
 
-install_compilation_tools="n"
+install_compilation_tools="y"
 install_build_tools="y"
-install_exec_tools="n"
+install_exec_tools="y"
 distro=""
 
 compilation_tools=" nasm xorriso mtools "
