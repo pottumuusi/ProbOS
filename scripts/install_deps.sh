@@ -67,10 +67,12 @@ decide_tools() {
 install_tools() {
 	if [ -n "$tools_to_install" ] ; then
 		if [ "ubuntu" == "$distro" ] ; then
+			echo "Next using apt-get to install $tools_to_install"
 			sudo apt-get install $tools_to_install
 		fi
 
 		if [ "arch" == "$distro" ] ; then
+			echo "Next using pacman to install $tools_to_install"
 			# sudo pacman -S nasm xorriso mtools qemu dvd+rw-tools
 			sudo pacman -S $tools_to_install
 		fi
