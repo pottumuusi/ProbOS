@@ -106,6 +106,7 @@ install_tools() {
 		local make_out_dir="${repo_root}/deps/make"
 		local make_url="http://ftp.gnu.org/gnu/make/${remote_make_tar}"
 
+		#### Install make - start
 		pushd ./
 		if [ ! -d "${old_make_build_dir}" ] ; then
 			mkdir ${old_make_build_dir}
@@ -150,6 +151,7 @@ install_tools() {
 			&& ${old_make_out_bin} check \
 			&& ${old_make_out_bin} install
 		popd
+		#### Install make - end
 	fi
 }
 
